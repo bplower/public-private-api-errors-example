@@ -1,4 +1,5 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module Shared.Errors where
 
@@ -23,7 +24,15 @@ data AuthError
   deriving (Show)
 
 instance ToAppError AuthError where
-  toAppError a = ErrorAuth a
+  toAppError = ErrorAuth
+
+-- | Wraps toPublic, pinning the type we're converting to
+-- This can be replicated by saying `toPublic a :: AuthError`
+toPubAuthError :: (PublicError a AuthError) => a -> AuthError
+toPubAuthError = toPublic
+
+toAppAuthError :: (PublicError a AuthError) => a -> AppError
+toAppAuthError = toAppError . toPubAuthError
 
 -- Public database error type
 data DbError
@@ -32,8 +41,14 @@ data DbError
   | DbServiceFailure ServiceError
   deriving (Show)
 
+toPubDbError :: (PublicError a DbError) => a -> DbError
+toPubDbError = toPublic
+
+toAppDbError :: (PublicError a DbError) => a -> AppError
+toAppDbError = toAppError . toPubDbError
+
 instance ToAppError DbError where
-  toAppError a = ErrorDb a
+  toAppError = ErrorDb
 
 -- General error types
 data ServiceError

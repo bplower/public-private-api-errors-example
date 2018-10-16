@@ -7,4 +7,4 @@ login :: (Either BackendError ())
 login = Left . ErrorAuth $ AccountDisabled
 
 queryDb :: (Either BackendError ())
-queryDb = Left . ErrorDb $ FailedConstraint
+queryDb = Left . ErrorDb . UnhandledSQLError $ "Some db sql error"

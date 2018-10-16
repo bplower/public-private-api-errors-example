@@ -7,10 +7,11 @@ import qualified Shared.Errors as SE
 data BackendError
   = ErrorAuth AuthError
   | ErrorDb DbError
+  deriving ( Show )
 
--- TODO: Finish implementing this. It could help really clean up Main.throwAppError
--- instance SE.PublicError BackendError SE.AppError where
---   toPublic ErrorAuth e = SE.ErrorAuth . SE.toPublic $ e
+instance SE.ToAppError BackendError where
+  toAppError (ErrorAuth e) = SE.toAppAuthError e
+  toAppError (ErrorDb e)   = SE.toAppDbError e
 
 -- Errors for authentication
 
@@ -32,7 +33,7 @@ instance SE.PublicError AuthError SE.AuthError where
 data DbError
   = FailedConstraint
   | NotFound
-  | UnhandledSQLError
+  | UnhandledSQLError String
   | DbServiceFailure
   deriving ( Show )
 

@@ -13,7 +13,15 @@ architecture. Since so much of this code is representative, the following is a
 detailed description of each module and where you might find it in a larger
 application.
 
-TODO, ran out of day
+| Module | Description |
+|--------|-------------|
+| Main.main | this is calling our two "endpoint" functions, representing an incoming HTTP request
+| Backend.Api | represents functions for a servant endpoints
+| Backend.Api.throwAppError | "throws" a servant error, resulting in a non-success HTTP status code. In the case of this example, it just prints the error to show us what was returned to the "client".
+| Backend.Domain | functions handling core business logic. nearly one-to-one with api layer functions, but these have no concept of the API or the existence of the public errors.
+| Backend.Errors | Backend error types. The root error type defines a method of converting its subtypes to a public error (via the instance of `SE.ToAppError`), and all subtypes define translations the corresponding public error type. Notice some sensative backend errors are converted to non-sensative varients, like `UnhandledSQLError Text` is converted to `SE.QueryFailure`.
+| Shared.Errors | This module represents an external common package shared between the backend and the frontend, allowing models, errors and routes to be used in the frontend and backend, providing compiletime garantees that the frontend/backend work together. Errors here are public, and information within them is visible to users and potential bad actors. Sensative information should never be contained or represented in these errors. This includes but is not limited to: user account status (disabled, missing, locked), raw SQL errors, raw shell command errors/output
+
 
 ## Running
 
